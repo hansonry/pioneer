@@ -402,8 +402,9 @@ private:
 	std::unique_ptr<Graphics::Material> m_bodyMat;
 	std::unique_ptr<Graphics::Material> m_atlasMat;
 	std::unique_ptr<Graphics::Material> m_lineMat;
+	std::unique_ptr<Graphics::Material> m_pointMat;
 	std::unique_ptr<Graphics::Material> m_gridMat;
-	Graphics::Drawables::Lines m_orbits;
+	Graphics::Drawables::TextLine m_orbits;
 
 	std::unique_ptr<vector3f[]> m_orbitVts;
 	std::unique_ptr<Color[]> m_orbitColors;

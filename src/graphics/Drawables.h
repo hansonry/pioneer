@@ -98,6 +98,23 @@ namespace Graphics {
 			RefCountedPtr<MeshObject> m_lineMesh;
 			std::unique_ptr<VertexArray> m_va;
 		};
+
+		// Three dimensional line segments between two points
+		// Needs to be drawn with TRIANGLE_STRIP and textLine shader
+		class TextLine {
+		public:
+			TextLine();
+			void SetData(const Uint32 vertCount, const vector3f *vertices, const Color &color, bool joined);
+			void SetData(const Uint32 vertCount, const vector3f *vertices, const Color *colors, bool joined);
+			void Draw(Renderer *, Material *);
+
+			Graphics::VertexFormatDesc GetVertexFormat() const;
+
+		private:
+			bool m_refreshVertexBuffer;
+			RefCountedPtr<MeshObject> m_lineMesh;
+			std::unique_ptr<VertexArray> m_va;
+		};
 		//------------------------------------------------------------
 
 		// Screen aligned quad / billboard / pointsprite

@@ -341,6 +341,8 @@ void SystemMapViewport::InputBindings::RegisterBindings()
 
 // ─── System Map Display ──────────────────────────────────────────────────────
 
+static size_t s_width = "width"_hash;
+
 SystemMapViewport::SystemMapViewport(GuiApplication *app) :
 	m_input(app->GetInput()),
 	m_app(app),
@@ -366,11 +368,15 @@ SystemMapViewport::SystemMapViewport(GuiApplication *app) :
 	Graphics::MaterialDescriptor lineMatDesc;
 
 	Graphics::RenderStateDesc rsd;
-	rsd.primitiveType = Graphics::LINE_STRIP;
+   rsd.cullMode = CULL_NONE;
+	rsd.primitiveType = Graphics::TRIANGLE_STRIP;
+	//rsd.primitiveType = Graphics::POINTS;
 
 	Graphics::VertexFormatDesc vfmt = m_lines.GetVertexFormat();
 
-	m_lineMat.reset(m_renderer->CreateMaterial("vtxColor", lineMatDesc, rsd, vfmt));
+	m_lineMat.reset(m_renderer->CreateMaterial("textLine", lineMatDesc, rsd, vfmt));
+   m_lineMat->SetPushConstant(s_width, float(0.03));
+
 
 	rsd.primitiveType = Graphics::LINE_SINGLE;
 	m_gridMat.reset(m_renderer->CreateMaterial("vtxColor", lineMatDesc, rsd, vfmt));
@@ -486,11 +492,7 @@ void SystemMapViewport::RenderOrbit(const Projectable &p, const ProjectedOrbit *
 
 	if (num_vertices > 1) {
 		//close the loop for thin ellipses
-		if (!(maxT < 1. || ecc > 1.0 || ecc < 0.6)) {
-			m_orbitVts[num_vertices] = m_orbitVts[0];
-			m_orbitColors[num_vertices] = m_orbitColors[0];
-			++num_vertices;
-		}
+		bool joined = !(maxT < 1. || ecc > 1.0 || ecc < 0.6);
 
 		// fade trail
 		const Color fadedColor = orbitData->color * fadedColorParameter;
@@ -501,7 +503,7 @@ void SystemMapViewport::RenderOrbit(const Projectable &p, const ProjectedOrbit *
 			m_orbitColors[currentColor + fadingColors] = fadedColor * scalingParameter;
 		}
 
-		m_orbits.SetData(num_vertices, m_orbitVts.get(), m_orbitColors.get());
+		m_orbits.SetData(num_vertices, m_orbitVts.get(), m_orbitColors.get(), joined);
 		m_orbits.Draw(m_renderer, m_lineMat.get());
 	}
 

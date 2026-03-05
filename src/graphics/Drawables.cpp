@@ -296,6 +296,84 @@ namespace Graphics {
 		}
 
 		//------------------------------------------------------------
+
+		TextLine::TextLine() :
+			m_refreshVertexBuffer(true),
+			m_va(new VertexArray(Graphics::ATTRIB_POSITION | Graphics::ATTRIB_DIFFUSE))
+		{
+			PROFILE_SCOPED()
+		}
+
+		void TextLine::SetData(const Uint32 vertCount, const vector3f *vertices, const Color &color, bool joined)
+		{
+			PROFILE_SCOPED()
+			assert(vertices);
+
+			// somethings changed so even if the number of verts is constant the data must be uploaded
+			m_refreshVertexBuffer = true;
+
+			// if the number of vert mismatches then clear the current vertex buffer
+			if (m_lineMesh.Valid() && m_lineMesh->GetVertexBuffer()->GetCapacity() < vertCount) {
+				// a new one will be created when it is drawn
+				m_lineMesh.Reset();
+			}
+
+			// populate the VertexArray
+			m_va->Clear(vertCount);
+			for (Uint32 i = 0; i < vertCount; i++) {
+				m_va->Add(vertices[i], color);
+				m_va->Add(vertices[i], color);
+			}
+         if (joined)
+         {
+            m_va->Add(vertices[0], color);
+            m_va->Add(vertices[0], color);
+         }
+		}
+
+		void TextLine::SetData(const Uint32 vertCount, const vector3f *vertices, const Color *colors, bool joined)
+		{
+			PROFILE_SCOPED()
+			assert(vertices);
+
+			// somethings changed so even if the number of verts is constant the data must be uploaded
+			m_refreshVertexBuffer = true;
+
+			// if the number of vert mismatches then clear the current vertex buffer
+			if (m_lineMesh.Valid() && m_lineMesh->GetVertexBuffer()->GetCapacity() < vertCount) {
+				// a new one will be created when it is drawn
+				m_lineMesh.Reset();
+			}
+
+			// populate the VertexArray
+			m_va->Clear(vertCount);
+			for (Uint32 i = 0; i < vertCount; i++) {
+				m_va->Add(vertices[i], colors[i]);
+				m_va->Add(vertices[i], colors[i]);
+			}
+
+         if (joined)
+         {
+            m_va->Add(vertices[0], colors[0]);
+            m_va->Add(vertices[0], colors[0]);
+         }
+		}
+
+		void TextLine::Draw(Renderer *r, Material *mat)
+		{
+			PROFILE_SCOPED()
+			if (m_va->IsEmpty())
+				return;
+
+			r->DrawBuffer(m_va.get(), mat);
+		}
+
+		Graphics::VertexFormatDesc TextLine::GetVertexFormat() const
+		{
+			return Graphics::VertexFormatDesc::FromAttribSet(m_va->GetAttributeSet());
+		}
+
+		//------------------------------------------------------------
 		PointSprites::PointSprites() :
 			m_refreshVertexBuffer(true),
 			m_va(new VertexArray(ATTRIB_POSITION | ATTRIB_NORMAL | ATTRIB_DIFFUSE))
