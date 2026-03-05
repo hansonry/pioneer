@@ -371,6 +371,7 @@ SystemMapViewport::SystemMapViewport(GuiApplication *app) :
    rsd.cullMode = CULL_NONE;
 	rsd.primitiveType = Graphics::TRIANGLE_STRIP;
 	//rsd.primitiveType = Graphics::POINTS;
+	//rsd.primitiveType = Graphics::LINE_STRIP;
 
 	Graphics::VertexFormatDesc vfmt = m_lines.GetVertexFormat();
 

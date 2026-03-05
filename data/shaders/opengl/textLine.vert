@@ -13,12 +13,10 @@ void main(void)
 {
 	vec4 base_pos = matrixTransform();
 
-   vec3 ndc = base_pos.xyz / base_pos.w;
-
    // TODO: I don't know how well gl_VertexID is supported. May need to 
    // replace it with another buffer
-   float offset = (mod(gl_VertexID, 2.0) - 0.5) * width;
+   float offset = (mod(gl_VertexID, 2.0) - 0.5) * width * base_pos.w;
    // TODO: Offset needs to be some kind of 2d vector so that xs aren't flat
-   gl_Position = vec4(ndc.x, ndc.y + offset, ndc.z, 1.0);
+   gl_Position = vec4(base_pos.x, base_pos.y + offset, base_pos.z, base_pos.w);
 	vertexColor = a_color;
 }
