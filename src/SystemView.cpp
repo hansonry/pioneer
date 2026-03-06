@@ -373,14 +373,14 @@ SystemMapViewport::SystemMapViewport(GuiApplication *app) :
 	//rsd.primitiveType = Graphics::POINTS;
 	//rsd.primitiveType = Graphics::LINE_STRIP;
 
-	Graphics::VertexFormatDesc vfmt = m_lines.GetVertexFormat();
+	Graphics::VertexFormatDesc orbit_vfmt = m_orbits.GetVertexFormat();
 
-	m_lineMat.reset(m_renderer->CreateMaterial("textLine", lineMatDesc, rsd, vfmt));
+	m_lineMat.reset(m_renderer->CreateMaterial("textLine", lineMatDesc, rsd, orbit_vfmt));
    m_lineMat->SetPushConstant(s_width, float(0.03));
 
-
+	Graphics::VertexFormatDesc line_vfmt = m_lines.GetVertexFormat();
 	rsd.primitiveType = Graphics::LINE_SINGLE;
-	m_gridMat.reset(m_renderer->CreateMaterial("vtxColor", lineMatDesc, rsd, vfmt));
+	m_gridMat.reset(m_renderer->CreateMaterial("vtxColor", lineMatDesc, rsd, line_vfmt));
 
 	ResetViewpoint();
 

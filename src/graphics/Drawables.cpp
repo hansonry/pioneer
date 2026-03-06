@@ -299,7 +299,7 @@ namespace Graphics {
 
 		TextLine::TextLine() :
 			m_refreshVertexBuffer(true),
-			m_va(new VertexArray(Graphics::ATTRIB_POSITION | Graphics::ATTRIB_DIFFUSE))
+			m_va(new VertexArray(Graphics::ATTRIB_POSITION | Graphics::ATTRIB_DIFFUSE | Graphics::ATTRIB_NORMAL))
 		{
 			PROFILE_SCOPED()
 		}
@@ -321,13 +321,43 @@ namespace Graphics {
 			// populate the VertexArray
 			m_va->Clear(vertCount);
 			for (Uint32 i = 0; i < vertCount; i++) {
-				m_va->Add(vertices[i], color);
-				m_va->Add(vertices[i], color);
+            vector3f in(0, 0, 0);
+            vector3f out(0, 0, 0);
+            int count = 0;
+            if (i > 0)
+            {
+               in = vertices[i] - vertices[i - 1];
+               count ++;
+            }
+            else if (joined)
+            {
+               in = vertices[i] - vertices[vertCount - 1];
+               count++;
+            }
+
+            if (i < (vertCount - 1))
+            {
+               out = vertices[i + 1] - vertices[i];
+               count ++;
+            }
+            else if (joined)
+            {
+               out = vertices[0] - vertices[i];
+               count ++;
+            }
+            vector3f tanget = (in + out) / (float)count;
+
+				m_va->Add(vertices[i], color, tanget);
+				m_va->Add(vertices[i], color, tanget);
 			}
          if (joined)
          {
-            m_va->Add(vertices[0], color);
-            m_va->Add(vertices[0], color);
+            vector3f in = vertices[0] - vertices[vertCount - 1];
+            vector3f out = vertices[1] - vertices[0];
+            vector3f tanget = (in + out) / 2.0;
+
+            m_va->Add(vertices[0], color, tanget);
+            m_va->Add(vertices[0], color, tanget);
          }
 		}
 
@@ -348,14 +378,42 @@ namespace Graphics {
 			// populate the VertexArray
 			m_va->Clear(vertCount);
 			for (Uint32 i = 0; i < vertCount; i++) {
-				m_va->Add(vertices[i], colors[i]);
-				m_va->Add(vertices[i], colors[i]);
+            vector3f in(0, 0, 0);
+            vector3f out(0, 0, 0);
+            int count = 0;
+            if (i > 0)
+            {
+               in = vertices[i] - vertices[i - 1];
+               count ++;
+            }
+            else if (joined)
+            {
+               in = vertices[i] - vertices[vertCount - 1];
+               count++;
+            }
+
+            if (i < (vertCount - 1))
+            {
+               out = vertices[i + 1] - vertices[i];
+               count ++;
+            }
+            else if (joined)
+            {
+               out = vertices[0] - vertices[i];
+               count ++;
+            }
+            vector3f tanget = (in.Normalized() + out.Normalized()) / (float)count;
+				m_va->Add(vertices[i], colors[i], tanget);
+				m_va->Add(vertices[i], colors[i], tanget);
 			}
 
          if (joined)
          {
-            m_va->Add(vertices[0], colors[0]);
-            m_va->Add(vertices[0], colors[0]);
+            vector3f in = vertices[0] - vertices[vertCount - 1];
+            vector3f out = vertices[1] - vertices[0];
+            vector3f tanget = (in.Normalized() + out.Normalized()) / 2.0;
+            m_va->Add(vertices[0], colors[0], tanget);
+            m_va->Add(vertices[0], colors[0], tanget);
          }
 		}
 
